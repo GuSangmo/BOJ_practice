@@ -1,0 +1,879 @@
+#1926 .그림
+
+""" 
+Flood fill의 예시.
+"""
+
+import sys
+from collections import deque
+input=sys.stdin.readline
+
+#1. INPUT SETTING
+N,M=map(int,input().rstrip().split())
+board=[list(map(int,input().rstrip().split())) for _ in range(N)]
+
+result_list=[]
+visit=[[0]*M for _ in range(N)]
+
+#2. BFS 구현
+dx=[0,1,0,-1]; dy=[1,0,-1,0]
+  
+def bfs(x,y):
+    global visit
+    deq=deque([])
+    deq.append((x,y))
+    height=0
+    while deq:
+        x,y=deq.popleft()
+        if board[x][y]==0: break
+        visit[x][y]=1
+        height+=1 
+        for i in range(4):
+            nx=x+dx[i]; ny=y+dy[i]
+            if nx<=-1 or ny<=-1 or nx>=N or ny>=M: continue #범위 out 
+            if board[nx][ny]==0 or visit[nx][ny]==1: continue
+            visit[nx][ny]=1            
+            deq.append((nx,ny))
+    return height
+for i in range(N):
+    for j in range(M):
+        result=0     #변수가 계속 쓰이고 있었음. result를 계속 바꿔줘야했었음.
+        if visit[i][j]==0: result=bfs(i,j)
+        if result>0: result_list.append(result)
+print(len(result_list))
+print(max(result_list) if result_list else 0)
+            
+
+#2178. 미로 탐색(다차원 배열에서의 거리 탐색)
+
+"""
+BFS는 결국 거리 순으로 노드들을 방문한다
+"""
+
+from collections import deque
+import sys 
+input=sys.stdin.readline
+
+#INPUT SETTING
+N,M=map(int,input().rstrip().split())
+board=[list(map(int,input().rstrip())) for _ in range(N)]
+visit_matrix=[[0]*M for _ in range(N)]
+
+#Calculation
+
+dx=[0,1,0,-1]; dy=[1,0,-1,0]
+
+def bfs(x,y):
+    global visit_matrix
+    deq=deque([])
+    deq.append((x,y))
+    visit_matrix[x][y]=1
+    while deq:
+        x,y=deq.popleft()
+        for i in range(4):
+            nx=x+dx[i]; ny=y+dy[i]
+            if nx<=-1 or ny<=-1 or nx>=N or ny>=M: continue
+            if board[nx][ny]==0 or visit_matrix[nx][ny]!=0: continue 
+            visit_matrix[nx][ny]=visit_matrix[x][y]+1
+            deq.append((nx,ny))
+   
+bfs(0,0)
+print(visit_matrix[N-1][M-1])
+
+
+
+#7576. 토마토    (2차원 버전)
+"""
+시작점이 여러개일때는, 시작점들을 큐에 담아버리자
+# """
+import sys
+from collections import deque
+input=sys.stdin.readline
+
+#1. INPUT SETTING
+M,N=map(int,input().rstrip().split())
+board=[]
+dist=[[-1]* M for _ in range(N)]
+nothing=0
+tomatoes=0
+first_queue=deque([])
+maximum=0
+
+for row in range(N):
+    array=list(map(int,input().rstrip().split()))
+    board.append(array)
+    for column in range(M):
+        if array[column]==1: 
+            first_queue.append((row,column))
+            dist[row][column]=0 #익은 애들은 시작점이니 0
+        if array[column]==-1: nothing+=1
+#이렇게 초기세팅 완료.
+#토마토가 없는 칸의 개수/ 초기 deque/ distance array 세팅 완료
+    
+
+#2. BFS setting
+
+def bfs():
+    global first_queue
+    global dist
+    global maximum
+    global tomatoes
+    dx=[0,0,1,-1]; dy=[1,-1,0,0]
+    
+    while first_queue:
+        x,y=first_queue.popleft() ; tomatoes+=1
+        for i in range(4):
+            nx=x+dx[i]; ny=y+dy[i]
+            #조건 설정
+            if nx<=-1 or ny<=-1 or nx>=N or ny>=M: continue #range out
+            if board[nx][ny]==-1: continue #no tomato
+            if dist[nx][ny]>=0: continue
+                #기존의 rotten tomato에서 갱신되었다면 1보다 클텐데 그것을 방지
+                #동일한 논리로, 처음에 들어간 놈도 무시해도 돼!
+            dist[nx][ny]=dist[x][y]+1
+            first_queue.append((nx,ny))
+            maximum=max(dist[nx][ny],maximum)
+            
+"""
+BFS를 애초에 실행이 된다고 전제하고, 실제 비교문에서나 조건을 걸어주자.
+--> 실행이 되는지 신경쓸필요 없음. 이미 input과정에서 
+1인 애들을 다 넣어줬잖아. 없는 경우가 문제지.
+"""
+            
+bfs()
+total=N*M-nothing        
+print(maximum if tomatoes==total else -1)    
+    
+"""
+나는 -1인 애들을 전체 토마토에서 빼준뒤 tomatoes를 세줬는데, 코드가 가장 짧은 분의 풀이는
+초기에 0인 토마토들을 세주었음.
+dist 배열같은걸 선언하지 않았고.
+
+"""
+
+
+
+#4179. 불!
+"""
+시작점의 종류가 여러개라면?
+"""
+
+import sys
+from collections import deque
+input=sys.stdin.readline
+
+
+#1. INITIAL SETTING
+R,C=map(int,input().rstrip().split())
+maze=[[0]*C for _ in range(R)] #일단 이렇게 초기화
+fire=[[-1]*C for _ in range(R)] #fire의 BFS
+jihoon=[[-1]*C for _ in range(R)]
+
+fire_queue=deque([])
+jihoon_queue=deque([])
+escape_time= 9999
+possible_path=0
+
+
+for row in range(R):
+    array=list(input().rstrip())
+
+    for column in range(C):
+        if array[column]=="#": maze[row][column]=-1
+        if array[column]=="F": fire[row][column]=0; fire_queue.append((row,column))
+        if array[column]=="J":jihoon[row][column]=0;jihoon_queue.append((row,column))
+        if row==(R-1) and array[column]!="#": possible_path+=1
+            
+#2. BFS of fire-불이 퍼지는 순간
+def fire_bfs(array,queue):
+    global fire
+    dx=[0,0,1,-1]; dy=[1,-1,0,0]
+    
+    while fire_queue:
+        x,y=fire_queue.popleft()
+        for i in range(4):
+            nx=x+dx[i]; ny=y+dy[i]
+            if nx<=-1 or ny<=-1 or nx>=R or ny>=C: continue #범위 out
+            if maze[nx][ny]==-1: continue #벽으로는 못퍼지니깐
+            if fire[nx][ny]>=0: continue #이미 갱신된 놈.
+            fire[nx][ny]=fire[x][y]+1
+            fire_queue.append((nx,ny))
+
+"""
+fire랑 비교해야하니깐, 일단 얘는 조건으로 남겨줘야지.
+"""            
+        
+def jihoon_run(queue):
+    fireburn=False
+    global fire
+    global escape_time
+    global possible_path
+    dx=[0,0,1,-1]; dy=[1,-1,0,0]
+
+    result_time=[]
+    result_path=0
+    while jihoon_queue:
+        x,y=jihoon_queue.popleft()
+        final_x,final_y=x,y
+        impossible_cnt=0
+        for i in range(4):
+            #맨 밑 탈출인거 추가해줘.
+            nx=x+dx[i]; ny=y+dy[i]
+   
+            if nx<=-1 or ny<=-1 or nx>=R or ny>=C: print(jihoon[x][y]+1); return True
+            if maze[nx][ny]==-1 or jihoon[nx][ny]>=0 : continue #벽이거나 방문했거나 불에 타거나
+            if jihoon[x][y]+1>= fire[nx][ny] and fire[nx][ny]!=-1: continue 
+#변수 업데이트하기 전에 그대로 갖다 썼구나.. + fire가 -1이 아닌거 한게 포인트.
+##댓글 참고하자!
+            jihoon[nx][ny]=jihoon[x][y]+1   #update가 안됐다면 minimum이 0보다 작지 않을까
+            jihoon_queue.append((nx,ny))            
+    return False  
+            
+            
+                
+#3.Code execution
+"""
+fire is spread away..
+"""
+fire_bfs(maze,fire_queue)
+
+"""
+While jihoon runs away.
+"""
+if not jihoon_run(jihoon_queue): print("IMPOSSIBLE")     
+
+
+
+
+
+#1697. 숨바꼭질
+"""
+1차원 array에서 bfs를 한다면?
+
+신경써줄 것은 continue 조건. 이거 하고 나서 
+
+바킹독님이 말씀하신 10만 이상을 신경쓸 필요가 없다는걸 이해하는게
+
+중요하단걸 깨달음.
+
+"""
+from collections import deque
+import sys
+visit=[0]*100001
+input=sys.stdin.readline
+deq=deque([])
+def bfs(start,check):
+    global visit
+    deq=deque([])
+    deq.append(start)
+    while deq:
+        now=deq.popleft()
+        if now==check: print(visit[now]); break
+        candidate=[now-1,now+1,now*2]        
+        for ele in candidate:
+            if ele<0 or ele>100000: continue
+            if visit[ele]: continue    
+            visit[ele]=visit[now]+1; deq.append(ele)
+
+N,K=map(int,input().rstrip().split())
+bfs(N,K)
+
+
+#1012. 유기농 배추
+"""
+그림 문제랑 동일함
+"""
+import sys, collections
+input=sys.stdin.readline
+
+def bfs(x,y,visit,board):
+    deq=collections.deque([])
+    deq.append((x,y))
+    visit[x][y]=1
+    dx=[0,0,1,-1]; dy=[1,-1,0,0]
+    while deq:
+        x,y=deq.popleft()
+        for i in range(4):
+            nx=x+dx[i]; ny=y+dy[i]
+            if nx<=-1 or ny<=-1 or nx>=N or ny>=M: continue
+            if visit[nx][ny] or board[nx][ny]==0: continue
+            visit[nx][ny]=1; deq.append((nx,ny))            
+
+            
+T=int(input().rstrip())
+            
+for _ in range(T):
+    N,M,K=map(int,input().rstrip().split())
+    board=[[0]*M for _ in range(N)]
+    visit=[[0]*M for _ in range(N)]
+    warm=0
+    for _ in range(K): #배추 위치 입력
+        loc_x,loc_y=map(int,input().rstrip().split())
+        print("loc:",(loc_x,loc_y))
+        board[loc_x][loc_y]=1
+    
+    for i in range(N):
+        for j in range(M):
+            if visit[i][j]==0 and board[i][j]==1: 
+                result=bfs(i,j,visit,board)
+                warm+=1
+    print(warm)
+
+
+
+#2468. 안전영역
+
+"""
+왜 브루트포스가 타당한가.
+
+만약 타당하다면 visit 변수의 처리를 어떻게 해야하는가에 대한 교훈을 준 문제.
+
+Code Review 해보자!
+
+1위 code는 map이랑 set이용했음. 
+
+"""
+
+import sys
+from collections import deque
+input=sys.stdin.readline
+
+#1. INPUT SETTING
+N=int(input().rstrip())
+board=[list(map(int,input().rstrip().split())) for _ in range(N)]
+visit=[[0]*N for _ in range(N)]
+result_list=[]
+
+
+#2. BFS & BFS_every_node execution
+
+#visit을 가지고 자꾸 귀찮게 만들어줄것같으니 
+
+def bfs(x,y,standard):
+    global board
+    global visit
+    deq=deque([])
+    deq.append((x,y))
+    dx=[0,0,-1,1]; dy=[1,-1,0,0]
+    while deq:
+        x,y=deq.popleft()
+        visit[x][y]=1
+        for i in range(4):
+            nx=x+dx[i]; ny=y+dy[i]
+            if nx<=-1 or ny<=-1 or nx>=N or ny>=N: continue
+            if visit[nx][ny] : continue
+            if board[nx][ny]<=standard: continue
+            visit[nx][ny]=1; deq.append((nx,ny))
+
+def global_bfs(standard):
+    area=0
+    for i in range(N):
+        for j in range(N):
+            if not visit[i][j] and board[i][j]>standard: #애초에 커야 방문 자체를 안함,(침수 안되게) 
+                bfs(i,j,standard); area+=1
+    return area
+                
+
+                
+#visit 변수 초기화해줄방법 생각해보기
+for standard in range(101):
+    result=global_bfs(standard)
+    result_list.append(result)
+    visit=[[0]*N for _ in range(N)]   
+    
+print(max(result_list))
+
+
+#5014. 스타트링크
+
+"""
+그... 1차원 array에서의 BFS와 동일함.
+조건 check해가면서 갱신하면 될 것같다.
+"""
+
+import sys
+from collections import deque
+input=sys.stdin.readline
+
+##Step 1. INPUT SETTING
+F,S,G,U,D=map(int,input().rstrip().split())
+dist_array=[-1]*(F+1)
+
+##Step 2. BFS SETTING
+def bfs(start,check):
+    global dist_array
+    deq=deque([])
+    deq.append(start)
+    dist_array[start]=0 #초기 node방문 처리
+    while deq:
+        node=deq.popleft()
+        if node==check: return dist_array[node]
+        floors=[node-D,node+U]
+        for floor in floors:
+            if floor<1 or floor>F: continue
+            if dist_array[floor]>=0: continue
+            dist_array[floor]=dist_array[node]+1
+            deq.append(floor) #담는거 까먹을뻔
+    return "use the stairs"        
+
+##Step 3. Operation
+
+print(bfs(S,G))
+
+#10026. 적록색약
+"""
+색약과 일반인은 어떻게 구분을 하는가
+
+생각해볼 이슈: 시작점의 종류가 여러개일때는 어떻게 할까?
+
+-> 초기값이랑 다른 걸 continue 조건으로 삼았음
+
+메모리를 조금 아낄수도 있었을텐데
+
+
+"""
+        
+## Step 1.INPUT SETTING       
+import sys
+from collections import deque
+input=sys.stdin.readline
+
+N=int(input().rstrip())
+normal_board=[[0]*N for _ in range(N)]
+weak_board=[[0]*N for _ in range(N)]
+n_visit=[[0]*N for _ in range(N)]
+w_visit=[[0]*N for _ in range(N)]
+#Red: -1/ Green: 0/ Blue: 1인데 일단 Green으로 초기화했음.
+
+normal_count=[0,0,0]
+weak_count=[0,0]
+
+for row in range(N):
+    pic=list(input().rstrip())
+    for column in range(N):
+        if pic[column]=="B": 
+            weak_board[row][column]=1
+            normal_board[row][column]=1
+        elif pic[column]=="R":
+            normal_board[row][column]=-1
+            
+## Step 2. BFS of both things
+
+def bfs(x,y,visit,board):
+    global normal_count
+    global weak_count
+    deq=deque([])
+    deq.append((x,y))
+    dx=[0,0,1,-1]; dy=[1,-1,0,0]
+    idx=board[x][y]
+    while deq:
+        x,y=deq.popleft()
+        visit[x][y]=1
+        for i in range(4):
+            nx=x+dx[i]; ny=y+dy[i]
+            if nx<=-1 or ny<=-1 or nx>=N or ny>=N: continue
+            if visit[nx][ny]: continue
+            if board[nx][ny]!=board[x][y]: continue
+            visit[nx][ny]=1; deq.append((nx,ny))
+    return idx  
+
+## Step 3. Calculation of zones
+### 각 zone 의 count를 담은 array에 담았다
+for i in range(N):
+    for j in range(N):
+        if not n_visit[i][j]: 
+            r1=bfs(i,j,n_visit,normal_board)
+            normal_count[r1]+=1; 
+        if not w_visit[i][j]:
+            r2=bfs(i,j,w_visit, weak_board)
+            weak_count[r2]+=1
+            
+            
+print(sum(normal_count),sum(weak_count))
+
+
+#12851. 숨바꼭질 2
+"""
+가장 빠른 방법을 찾는 가짓수가 추가되었다.
+
+이번에는, 방문의 횟수를 담는 array를 추가해보자. 
+"""
+
+import sys,collections
+input=sys.stdin.readline
+
+N,K=map(int,input().rstrip().split())
+
+dist=[-1]*100001 #실질적인 (최소) 방문횟수를 의미한다.
+visit=[0]*100001 #중복을 허용한 방문횟수를 담을 array
+
+def bfs(start,check,dist,visit):
+    deq=collections.deque([])
+    deq.append(start)
+    dist[start]=0; visit[start]=1
+    while deq:        
+        ele=deq.popleft()
+        if ele==check: break        
+        test=[ele-1, ele+1, 2*ele]
+        for idx in range(3):
+            tmp=test[idx]
+            if tmp<0 or tmp>100000: continue
+            if dist[tmp]>=0:  #이미 방문한 애들
+                if dist[tmp]<dist[ele]+1: continue  #굳이 얘를 왜 갱신해
+                elif dist[tmp]==dist[ele]+1: visit[tmp]+=visit[ele]; continue
+                    #BFS의 원리에 의하여, 거리가 K인 node들 다음으로는 K+1인 node들이 담기게 되어있다.
+                    #따라서 tmp는 그 ele를 통해서 올 수도 있었단 소리.            
+            dist[tmp]=dist[ele]+1; visit[tmp]+=visit[ele]
+            deq.append(tmp)
+    print(dist[check])
+    print(visit[check])
+        
+
+bfs(N,K,dist,visit)
+
+
+#13549. 숨바꼭질 3
+"""
+이번에는 순간이동의 시간간격이 없어졌다.
+
+따라서 X*2를 계속해서 visit시켜주면 되지 않을까? 뭔가 될것같은 이 느낌적 느낌.
+그걸 계속 queue에 넣는거징
+"""
+
+## Step 1. INPUT SETTING
+import sys, collections
+input=sys.stdin.readline
+N,K=map(int,input().rstrip().split())
+dist=[-1]*100001
+
+def bfs(start,check):
+    deq=collections.deque([])
+    deq.append(start)
+    dist[start]=0
+    while deq:
+        node=deq.popleft()
+        if node==check: print(dist[node]); break
+       
+        tmp=node
+        #2배가 되는 순간이동을 계속 추가
+        while tmp<=100000:    #log 100000:뭘 하든 18번 안에 끝남.
+            if tmp==0: break            
+            tmp*=2 
+            if tmp<=100000: 
+                if dist[tmp]==-1: dist[tmp]=dist[node]; deq.append(tmp)
+        candidates=[node-1,node+1]
+        for candidate in candidates:
+            if candidate<0 or candidate>100000: continue
+            if dist[candidate]>=0: continue
+            dist[candidate]=dist[node]+1
+            deq.append(candidate)
+bfs(N,K)
+
+
+
+#13549. 숨바꼭질 4
+"""
+ 이번에는 이동경로까지 포함해야한다.
+
+숨바꼭질 3과 다른 것은, 얘는 시간에 차이가 없다.
+
+traceback이라는 걸 통해 이전 node에 대한 정보를 저장하자.
+
+"""
+
+## Step 1. INPUT SETTING
+import sys, collections
+input=sys.stdin.readline
+N,K=map(int,input().rstrip().split())
+dist=[-1]*100001
+traceback=[-1]*100001
+
+
+def bfs(start,check):
+    global traceback
+    deq=collections.deque([])
+    deq.append(start)
+    dist[start]=0
+    traceback[start]=start
+    tracking=True
+    while deq:
+        node=deq.popleft()
+        tmp=node
+        if node==check: 
+            print(dist[node])
+            
+            traceback_list=[]
+            end=check
+            traceback_list.append(end)
+            while end!=start:
+                prev=traceback[end]
+                traceback_list.append(prev); end=prev
+            break
+        candidates=[node-1,node+1,2*node]
+        for candidate in candidates:
+            if candidate<0 or candidate>100000: continue
+            if dist[candidate]>=0: continue
+            dist[candidate]=dist[node]+1 ; traceback[candidate]=node
+            deq.append(candidate)
+    return traceback_list
+result=bfs(N,K)
+
+for ele in result[::-1]: print(ele, end=' ')
+
+
+#17071. 숨바꼭질 5
+"""
+이번엔 동생도 움직인다. 동생의 거리를 설정하자.
+"""
+
+import sys, collections
+input=sys.stdin.readline
+
+visit_dist=[[-1]*500001 for _ in range(2)]  #홀수, 짝수 각각 최단거리를 추가해줘야함.
+N,K=map(int,input().rstrip().split())
+
+
+def bfs(start):
+
+    global visit_dist
+
+    deq=collections.deque([])
+    deq.append([start,0])
+    visit_dist[0][start]=0
+    flag=0
+ 
+    while deq:
+        node,cnt=deq.popleft()
+        flag=cnt%2
+        candidates=[node+1, node-1, 2*node]
+        for ele in candidates:
+            if ele<0 or ele>500000: continue
+            if visit_dist[1-flag][ele]>=0: continue
+            visit_dist[1-flag][ele]=cnt+1  
+            deq.append((ele,cnt+1))            
+ 
+bfs(N)
+
+follow=-1
+t=0; flag=0; 
+while K<=500000:
+    if visit_dist[flag][K]!=-1:
+        if visit_dist[flag][K]<=t:
+            follow=t; break
+    flag=1-flag
+    t+=1
+    K+=t
+
+print(follow)
+
+
+
+#2667. 단지번호 붙이기
+"""
+그림(BOJ 1926)과 동일한 유형의 문제. 
+연결요소의 총 개수를 찾은 뒤, 
+각각의 크기를 return하면 된다.
+"""
+
+##Step 1. INPUT SETTING & Variable Declaration
+import sys
+from collections import deque
+input=sys.stdin.readline
+
+N=int(input().rstrip())
+board=[list(map(int, input().rstrip())) for _ in range(N)]
+connected=0
+sizes=[]
+visit=[[0]*N for _ in range(N)]
+
+##Step 2. BFS 구현=> 1에서만 출발한단 조건은 반복문에서 실시 (즉, 초기값 신경쓸 필요없게끔)
+def bfs(x,y):
+    global visit
+    deq=deque([])
+    size=0
+    deq.append((x,y))
+    dx=[0,0,1,-1]; dy=[1,-1,0,0]   
+    while deq:
+        x,y=deq.popleft(); size+=1
+        visit[x][y]=1   #시작점 방문처리 빼먹지 말고!        
+        for i in range(4):
+            nx=x+dx[i]; ny=y+dy[i]
+            if nx<=-1 or ny<=-1 or nx>=N or ny>=N: continue #범위 out
+            if visit[nx][ny] or board[nx][ny]==0: continue #unconnected or already visited
+            visit[nx][ny]=1; deq.append((nx,ny))
+            
+    return size
+##Step 3. BFS for every node -> 초기값이 1일때만 수행. 1인데 이미 connected 면 신경쓸필요없겠지
+#### 내친김에 바킹독님 블로그에서 왜 이게 O(N) or O(Row* Column)인지 보고 오자
+"""
+Every node에 대해 search할때, already visited인지 조건을 걸어줘야함
+
+이유: 연결요소의 크기가 1일수도 있는데 그걸 제대로 고려하지 않을 수 있음
+
+
+어쨌거나 x,y의 초기값에 대해서는 size=1이 수행이 되는데, 
+그러면 이미 방문한애가 중복으로 연결요소에 들어갈수있음
+
+그렇다고 result>1일때를 조건으로 잡으면 각각 떨어진애들을 고려하지 못함 
+
+그냥 틀린 코드들 보면서 CODE REVIEW ㄱㄱㄱㄱㄱ
+
+
+"""
+
+for i in range(N):
+    for j in range(N):
+        if board[i][j]==1 and not visit[i][j]: 
+            result=bfs(i,j)
+            if result>=1: sizes.append(result); connected+=1   
+                #1과 비교하는 이유: already visited 1이어도, size는 무조건 1이므로
+                
+print(connected)
+sizes.sort()
+for size in sizes:print(size)
+
+#7562. 나이트의 이동
+
+
+import sys, collections
+input=sys.stdin.readline
+
+T=int(input().rstrip())
+for _ in range(T):
+    length=int(input().rstrip())
+    deq=collections.deque()
+    dist=[[-1]*length for _ in range(length)]
+    s_x,s_y=map(int,input().rstrip().split())
+    e_x,e_y=map(int,input().rstrip().split())
+    
+    deq.append((s_x,s_y))
+    dx=[-2,-2,-1,-1,1,1,2,2]
+    dy=[-1,1,-2,2,-2,2,-1,1]
+    dist[s_x][s_y]=0
+    while deq:
+        x,y=deq.popleft()
+        if x==e_x and y==e_y:print(dist[e_x][e_y]); break
+        
+        for i in range(8):
+            nx=x+dx[i]; ny=y+dy[i]
+            if nx<=-1 or ny<=-1 or nx>=length or ny>=length: continue
+            elif dist[nx][ny]>=0: continue
+            dist[nx][ny]=dist[x][y]+1
+            deq.append((nx,ny))
+
+
+#7569. 토마토
+"""
+토마토는 이제 3차원
+
+3차원 array를 설정
+"""
+
+##Step 1. INPUT SETTING
+
+import sys,collections
+input=sys.stdin.readline
+
+M,N,H=map(int,input().rstrip().split())
+dist=[[[-1]*M for _ in range(N)] for _ in range(H)]
+tomatoes=[]
+spread_queue=collections.deque()
+safe_zone=0
+spread_count=0
+
+for height in range(H):
+    floor=[]
+    for column in range(N):
+        array=list(map(int,input().rstrip().split()))
+        floor.append(array)
+        for row in range(M):
+            if array[row]==-1: safe_zone+=1
+            elif array[row]==1: 
+                spread_queue.append((height,column,row))
+                dist[height][column][row]=0
+    tomatoes.append(floor)
+
+def bfs(height,column,row,deq):
+    global safe_zone
+    global spread_count
+    minimum=0
+    while deq:
+        x,y,z=deq.popleft(); spread_count+=1
+        dx=[1,-1,0,0,0,0]
+        dy=[0,0,1,-1,0,0]
+        dz=[0,0,0,0,1,-1]
+        for i in range(6):
+            nx=x+dx[i]; ny=y+dy[i]; nz=z+dz[i]
+            if nx<=-1 or ny<=-1 or nz<=-1 or nx>=H or ny>=N or nz>=M: continue
+            if dist[nx][ny][nz]>=0 or tomatoes[nx][ny][nz]==-1: continue
+            dist[nx][ny][nz]=dist[x][y][z]+1 
+            deq.append((nx,ny,nz))
+            minimum=max(minimum, dist[nx][ny][nz])
+    check_condition=(spread_count==height*column*row-safe_zone)
+    print(minimum if check_condition else -1)
+bfs(H,N,M,spread_queue)
+
+
+
+#6593. 상범 빌딩
+"""
+나는 3D로 본다.
+3차원 array를 설정
+"""
+
+##Step 1. Function Implementation ahead
+
+import sys,collections
+input=sys.stdin.readline
+
+def bfs(height,column,row,deq,data,distance):
+    while deq:
+        x,y,z=deq.popleft()
+        dx=[1,-1,0,0,0,0]
+        dy=[0,0,1,-1,0,0]
+        dz=[0,0,0,0,1,-1]
+        
+        if (x,y,z)==(r_x,r_y,r_z): 
+            result=dist[x][y][z]
+            other_string= "Escaped in "+str(result)+" minute(s)."
+            return other_string
+        
+        for i in range(6):
+            nx=x+dx[i]; ny=y+dy[i]; nz=z+dz[i]
+            if nx<=-1 or ny<=-1 or nz<=-1 or nx>=L or ny>=R or nz>=C: continue
+            if dist[nx][ny][nz]>=0 or warehouse[nx][ny][nz]==-1: continue
+            dist[nx][ny][nz]=dist[x][y][z]+1 
+            deq.append((nx,ny,nz))
+    string="Trapped!"
+    return string
+
+##Step 2. 입출력 설정
+
+while True:
+    L,R,C=map(int,input().rstrip().split())
+    if L==0 and R==0 and C==0: break
+    
+    dist=[[[-1]*C for _ in range(R)] for _ in range(L)]
+    warehouse=[]
+    start_queue=collections.deque()
+    for height in range(L):
+        floor=[[0]*C for _ in range(R)]
+        for row in range(R):            
+            array=list(input().rstrip())           
+            for column in range(C):
+                if array[column]=="#":
+                    floor[row][column]= -1                    
+                elif array[column]==".":
+                    floor[row][column]= 0
+                elif array[column]=="S":
+                    floor[row][column]=1
+                    dist[height][row][column]=0
+                    start_queue.append((height,row,column))
+                else:
+                    (r_x,r_y,r_z)=(height,row,column)
+        warehouse.append(floor)
+        string=input().rstrip()
+    print(bfs(L,R,C,start_queue,warehouse,dist))
+
+
+
