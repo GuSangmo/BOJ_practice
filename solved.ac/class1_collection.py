@@ -93,9 +93,8 @@ for _ in range(9):
     ele=int(sys.stdin.readline())
     num_list.append(ele)
 print(max(num_list))
-print(   (num_list.index(max(num_list)) +1))
+print((num_list.index(max(num_list)) +1))
     
-  
 #2577. 숫자의 개수
 import sys
 mul=1
