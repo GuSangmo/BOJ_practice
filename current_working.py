@@ -1,27 +1,52 @@
-#1018. 체스판 다시 칠하기
+#2660. 회장뽑기
+"""
+점수가 매겨지는 기준은, 각 사람들까지의 거리 중 최대값이라고 보면 된다.
+모든 사람의 모든 관계에 대해서 거리를 구해야하므로, 플로이드-워셜 알고리즘을 이용하자.
+"""
 
-#Variable Assignment, Matrix Representation
 
+#Step 1. INPUT SETTING
 import sys
-N,M= map(int, sys.stdin.readline().rstrip().split())
-matrix=[] ; b=black_pattern=list("BWBWBWBW"); w=white_pattern=list("WBWBWBWB")
-black_matrix=[b,w,b,w,b,w,b,w]; white_matrix=[w,b,w,b,w,b,w,b]
-sliding_window_list=[] #Move this window to calculate value
-for _ in range(N):
-    row=list(sys.stdin.readline().rstrip())
-    matrix.append(row)
+input=sys.stdin.readline
+N=int(input().rstrip())
+big_num=1e2
+adj_mtx=[[big_num]*N for _ in range(N)]
+
+while 1:
+    start, end=map(int,input().rstrip().split())
+    if start==-1 and end==-1: break
+    adj_mtx[start-1][end-1]=1
+    adj_mtx[end-1][start-1]=1
+
+for i in range(N):
+    for j in range(N):
+        if i==j:adj_mtx[i][j]=0
+            
+#Step 2. Floyd_Warshall Alg to calculate each dist.
+
+for k in range(N):
+    for i in range(N):
+        for j in range(N):
+            adj_mtx[i][j]=min(adj_mtx[i][j],adj_mtx[i][k]+adj_mtx[k][j])
+
+#Step 3. Calculate each person's score.            
+scores=[]
+
+max_min=10000
+for i in range(N):
+    tmp=max(adj_mtx[i])
+    if tmp<max_min:max_min=tmp 
+    scores.append((i+1,max(adj_mtx[i])))
+print(max_min)
 
 
-##Function to calculate min.val for pattern change 
-def check_diff_string(matrix):
-    diff_cnt1=sum([sum(matrix[i][j]!=black_matrix[i][j] for i in range(8)) for j in range(8)])
-    diff_cnt2=sum([sum(matrix[i][j]!=white_matrix[i][j] for i in range(8)) for j in range(8)])
-    diff_cnt=min(diff_cnt1,diff_cnt2)
-    return diff_cnt
+#Step 4. 결과 처리
 
-###Operation
-for x_idx in range(0,N-7):
-    for y_idx in range(0,M-7):
-        sliced_mtx=[row[y_idx:y_idx+8]  for row in matrix[x_idx:x_idx+8]]
-        sliding_window_list.append(check_diff_string(sliced_mtx))
-print(min(sliding_window_list)) 
+candidates=[]; cnt=0
+for people, score in scores:
+    if score==max_min: candidates.append(people); cnt+=1
+
+        
+print(max_min, cnt)
+print(*candidates,end=" ")
+        
