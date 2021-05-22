@@ -1,4 +1,4 @@
-#14289. 본대 산책 3
+#12850. 본대 산책 2
 
 """
 인접 행렬을 K번제곱하면 K개의 간선을 거쳐서 그 점에 도착하는 경로의 개수가 나옴.
@@ -33,13 +33,8 @@ def powerMatrix(N,K):
 #Operation start
 import sys
 input=sys.stdin.readline
-N,M=map(int,input().rstrip().split())
 
-mtx=[[0]*N for _ in range(N)]
-for _ in range(M):
-    a,b=map(int,input().rstrip().split())
-    mtx[a-1][b-1]=1
-    mtx[b-1][a-1]=1
+mtx=[[0,1,1,0,0,0,0,0],[1,0,1,1,0,0,0,0],[1,1,0,1,1,0,0,0],[0,1,1,0,1,1,0,0],[0,0,1,1,0,1,1,0],[0,0,0,1,1,0,0,1],[0,0,0,0,1,0,0,1],[0,0,0,0,0,1,1,0]]
 D=int(input().rstrip())
 final_result=matmul(powerMatrix(mtx,D-1),mtx) if D>1 else mtx
 
