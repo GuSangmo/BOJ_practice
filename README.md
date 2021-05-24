@@ -1,8 +1,10 @@
 
 # Challenge Description:
-💡 **Goal**: **Platinum V** 달성
+💡 **Goal**: **Platinum V** 달성 (FINISHED )
 
-⏲️ **Period**: 21.02.05 ~
+💡 **NEW Goal**: Code Review+ 실전적인 코딩테스트 문제들 풀기!
+
+⏲️ **Period**: 21.02.05 ~ **21.05.21**
 
 📁 Contents: ***문제풀이 소스코드를 다양한 기준으로 폴더화시켰습니다.***
 
