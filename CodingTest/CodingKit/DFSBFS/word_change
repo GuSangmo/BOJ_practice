@@ -1,0 +1,27 @@
+from collections import deque
+def word_dist(str1, str2):
+    result = sum([int(i!=j) for i,j in zip(list(str1), list(str2))])
+    return result
+
+def solution(begin, target, words):
+    word_lnd = list(enumerate(words))
+    dist= [0] * (len(words)+1)
+    
+    #Target이 words에 없다면, 바꿀 수 없으므로 0
+    if target not in words: return 0
+    word_lnd.append( ( len(words), target) ) 
+    deq = deque([(0,begin)])
+    result = False
+    
+    # BFS 시작
+    while deq:
+        (cur_pos, cur_word) = deq.popleft()
+        if cur_word == target : 
+            result = True
+        for next_pos,next_word in word_lnd:
+            if dist[next_pos] > 0 : continue #이미 갱신
+            if word_dist(cur_word, next_word)!=1: continue
+            dist[next_pos] = dist[cur_pos]+1
+            deq.append((next_pos,next_word))
+    if result: answer = dist[-1]
+    return answer
