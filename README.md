@@ -1,10 +1,18 @@
 
 # Challenge Description:
-💡 **Goal**: **Platinum V** 달성 (FINISHED )
+💡 **1st Goal**: **Platinum V** 달성 (FINISHED )
+   **2nd goal ** : 
+   - Cpp로 code porting 
+   - 전반적인 CP algorithm에 익숙해지며, kakao coding test를 능숙히 풀 수 있는 수준을 목표로 함
 
-💡 **NEW Goal**: Code Review+ 실전적인 코딩테스트 문제들 풀기!
 
-⏲️ **Period**: 21.02.05 ~ **21.05.21**
+⏲️ **Period**: 
+
+## 1st goal:
+**21.02.06** ~ **21.05.21**
+
+## 2nd goal:
+**21.11.25** ~
 
 📁 Contents: ***문제풀이 소스코드를 다양한 기준으로 폴더화시켰습니다.***
 
@@ -26,7 +34,7 @@ Velog에는 레퍼런스들 기반의 설명과 일부 이론들을, Github에�
 
 3.**solved.ac**: 티어별 문제들에 대한 풀이를 올릴 예정입니다.
 
-4.**기출문제**: 각 회사별 코딩테스트에 대한 풀이를 시도할 예정입니다.
+4.**CodingTest**: 각 회사별 코딩테스트에 대한 풀이를 시도할 예정입니다.
 
 
 
