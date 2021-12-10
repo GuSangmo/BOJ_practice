@@ -1,0 +1,27 @@
+/*
+2438. 별 찍기 -2
+
+역시 내장함수를 공부해야할 것 같다.
+*/
+
+#include <bits/stdc++.h>
+using namespace std;
+
+
+
+
+int main(){
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	int N; 
+	cin >>N;
+	for (int i=0;i<N; i++){
+		for (int j=0; j<N-i;j++){
+			cout <<"*";
+		}
+		cout <<"\n";
+	}
+	return 0;
+	}
+
+	
