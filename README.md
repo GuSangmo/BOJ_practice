@@ -3,10 +3,10 @@
 💡 **1st Goal**: **Platinum V** 달성 (FINISHED )
 
 
-   **2nd goal** : 
+💡💡 **2nd goal** : 
    - Cpp로 code porting 
    - 전반적인 CP algorithm에 익숙해지며, kakao coding test를 능숙히 풀 수 있는 수준을 목표로 함
-
+  
 
 ⏲️ **Period**: 
 
