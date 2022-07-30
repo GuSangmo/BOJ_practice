@@ -21,7 +21,7 @@ class Solution:
             for start_idx in range(length):
                 end_idx = start_idx + term
                 if end_idx >= length : continue 
-                if s[start_idx] != s[end_idx] : continue #no need to continue 
+                if s[start_idx] != s[end_idx] or D[start_idx+1][end_idx-1] == 0: continue #no need to continue 
                 D[start_idx][end_idx] = D[start_idx+1][end_idx-1]+2
                 if D[start_idx][end_idx] > max_length:
                     start, end = start_idx, end_idx
