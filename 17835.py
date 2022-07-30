@@ -45,8 +45,6 @@ def dijkstra(start_points):
             if cost_candidate < costs[near_node]:
                 costs[near_node] = cost_candidate
                 heapq.heappush(q, (cost_candidate, near_node))
-
-
 dijkstra(test_points)
 
 max_idx = -1 ; max_dist = -1
