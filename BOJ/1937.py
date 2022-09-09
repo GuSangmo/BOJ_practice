@@ -1,42 +1,48 @@
 #1937. 욕심쟁이 판다
 """
-대나무를 좋아하는 판다는, 계속 무언가를 먹어치움
-근처로 움직이려면 더 많이 먹어야 함
-
-Fail 1. 단순 BFS/DFS를 돌리면 모든 점을 시작점으로 돌아야 하기 때문에, 2500,000 **2 ==> TLE.
-
-Fail 2. 따라서 DFS로 한번 다 돈 후 -> 이미 업데이트된것들은 DP로 탐색시간을 줄여야 한다.
-
-
+대나무가 더 많은 곳으로 이동하는 판다.
+최단 경로가 아니다. 따라서 DFS.
+모든 곳에서의 출발 정보가 필요한데, 그러면 TLE가 뜰 것이다 ==> DP
 """
 
 import sys 
-from collections import deque
 sys.setrecursionlimit(100_000_0)
 input = sys.stdin.readline 
 N = int(input().rstrip())
-bamboos = [list(map(int,input().rstrip().split())) for _ in range(N)]
-paths = [[0 for _ in range(N)] for _ in range(N)]
+forests = [list(map(int,input().rstrip().split())) for _ in range(N)]
+
+#dp[row][col] ==> (row,col)에서 이동 가능한 최대 칸의 개수
+
+dp = [[0 for _ in range(N)] for _ in range(N)]
+visits = [[False for _ in range(N)] for _ in range(N)]
 
 dx = [0,0,1,-1]
 dy = [1,-1,0,0]
-
-
+maximum = -1
 def dfs(row,col):
-    if paths[row][col] > 0 :
-        return paths[row][col]    
-    paths[row][col] = 1
-    for idx in range(4):
-        tmp_row = row + dx[idx]
-        tmp_col = col+ dy[idx]
-        if tmp_row <0 or tmp_col < 0 or tmp_row >=N or tmp_col >= N : continue
-        if bamboos[tmp_row][tmp_col] <= bamboos[row][col] : continue 
-        paths[row][col] = max(paths[row][col], dfs(tmp_row,tmp_col)+1 )
-    return paths[row][col]
+    global maximum
+    #If already done, use caching
+    if dp[row][col] > 0 :
+        maximum = max(maximum, dp[row][col])
+        return dp[row][col]
+    dp[row][col] = 1
+    visits[row][col] = True  #방문처리
+    for i in range(4):
+        next_row = row + dx[i]
+        next_col = col + dy[i]
+        if next_row <0 or next_col < 0 or next_row >=N or next_col >=N : continue 
+        if visits[next_row][next_col] : continue 
+        if forests[next_row][next_col] <= forests[row][col]:
+            dp[row][col] = max(dp[row][col], 1 + dfs(next_row, next_col))
+        
+    visits[row][col] = False 
+    return dp[row][col]
 
-answer = 1
+answer = -1
 for i in range(N):
     for j in range(N):
         answer = max(answer, dfs(i,j))
 
 print(answer)
+
+
